@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>お知らせ｜長久寺 檀信徒専用ページ</title>
+
+  <script
+    charset="utf-8"
+    src="https://static.line-scdn.net/liff/edge/2/sdk.js">
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #101010;
+      color: #eeeeee;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+    }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 42px 30px 80px;
+    }
+
+    .temple-name {
+      color: #9b9b9b;
+      font-size: 17px;
+      letter-spacing: 0.12em;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .line {
+      height: 1px;
+      background: #383838;
+      margin: 38px 0 48px;
+    }
+
+    #loading {
+      padding: 30px 0;
+      color: #aaaaaa;
+      font-size: 16px;
+    }
+
+    #error {
+      display: none;
+      background: #1b1b1b;
+      border: 1px solid #383838;
+      border-radius: 18px;
+      padding: 28px 24px;
+      color: #ef9a9a;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    #content {
+      display: none;
+    }
+
+    .welcome {
+      color: #aaaaaa;
+      font-size: 15px;
+      margin-bottom: 32px;
+    }
+
+    .notice {
+      display: block;
+      background: #1b1b1b;
+      border: 1px solid #383838;
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .notice-date {
+      color: #8f8f8f;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .notice-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .notice-text {
+      color: #bdbdbd;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 32px;
+      color: #bbbbbb;
+      text-decoration: none;
+      font-size: 15px;
+    }
+
+    .back:hover {
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding:
+          38px 30px
+          calc(70px + env(safe-area-inset-bottom));
+      }
+
+      h1 {
+        font-size: 30px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="page">
+
+    <div class="temple-name">
+      曹洞宗 春日山
+    </div>
+
+    <h1>お知らせ</h1>
+
+    <div class="line"></div>
+
+    <div id="loading">
+      LINEアカウントを確認しています…
+    </div>
+
+    <div id="error"></div>
+
+    <div id="content">
+
+      <div id="welcome" class="welcome"></div>
+
+      <!--
+        ↓↓↓ お知らせはここに追加していく ↓↓↓
+      -->
+
+      <article class="notice">
+        <div class="notice-date">
+          2026年9月18日
+        </div>
+
+        <div class="notice-title">
+          檀信徒専用ページを開設しました
+        </div>
+
+        <div class="notice-text">
+          長久寺檀信徒の皆様へのお知らせを、
+          こちらのページからご覧いただけるようになりました。
+        </div>
+      </article>
+
+      <!--
+        ↑↑↑ お知らせはここまで ↑↑↑
+      -->
+
+      <a class="back" href="./">
+        ← 檀信徒専用ページへ戻る
+      </a>
+
+    </div>
+
+  </main>
+
+
+<script>
+
+const LIFF_ID =
+  "2011649394-wJceQFXt";
+
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
+
+
+async function start() {
+
+  const loading =
+    document.getElementById("loading");
+
+  const content =
+    document.getElementById("content");
+
+  const errorBox =
+    document.getElementById("error");
+
+  try {
+
+    /*
+     * LIFF初期化
+     */
+    await liff.init({
+      liffId: LIFF_ID,
+      withLoginOnExternalBrowser: true
+    });
+
+
+    /*
+     * 未ログインならLINEログイン
+     */
+    if (!liff.isLoggedIn()) {
+
+      loading.textContent =
+        "LINEへログインします…";
+
+      liff.login({
+        redirectUri:
+          window.location.href
+      });
+
+      return;
+    }
+
+
+    /*
+     * IDトークン取得
+     */
+    const idToken =
+      liff.getIDToken();
+
+
+    if (!idToken) {
+
+      throw new Error(
+        "LINE認証情報を取得できませんでした。"
+      );
+
+    }
+
+
+    /*
+     * GASへ登録状況を問い合わせ
+     */
+    const response =
+      await fetch(
+        GAS_URL,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "text/plain;charset=utf-8"
+          },
+
+          body: JSON.stringify({
+            action: "check",
+            idToken: idToken
+          })
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    /*
+     * API自体でエラー
+     */
+    if (!result.success) {
+
+      throw new Error(
+        result.message ||
+        "認証に失敗しました。"
+      );
+
+    }
+
+
+    /*
+     * 登録されていない、または無効
+     */
+    if (!result.registered) {
+
+      loading.style.display =
+        "none";
+
+      errorBox.style.display =
+        "block";
+
+      errorBox.innerHTML =
+        "このLINEアカウントでは、" +
+        "檀信徒専用ページをご利用いただけません。" +
+        "<br><br>" +
+        "トップページから認証を行ってください。";
+
+      return;
+    }
+
+
+    /*
+     * 認証成功
+     */
+    document.getElementById(
+      "welcome"
+    ).textContent =
+      result.name +
+      " 様";
+
+
+    loading.style.display =
+      "none";
+
+    content.style.display =
+      "block";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    loading.style.display =
+      "none";
+
+    errorBox.style.display =
+      "block";
+
+    errorBox.textContent =
+      "認証処理中にエラーが発生しました。" +
+      "（" +
+      error.message +
+      "）";
+
+  }
+
+}
+
+
+start();
+
+</script>
+
+</body>
+</html>
