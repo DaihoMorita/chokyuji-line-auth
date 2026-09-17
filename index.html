@@ -185,6 +185,24 @@
       text-decoration: none;
     }
 
+    /* リンクになっているカード */
+    a.menu-card {
+      cursor: pointer;
+      transition:
+        background .15s ease,
+        border-color .15s ease,
+        transform .15s ease;
+    }
+
+    a.menu-card:hover {
+      background: #222;
+      border-color: #555;
+    }
+
+    a.menu-card:active {
+      transform: scale(.98);
+    }
+
     .menu-icon {
       font-size: 27px;
       margin-bottom: 18px;
@@ -321,7 +339,8 @@
 
     <div class="menu-grid">
 
-      <div class="menu-card">
+      <!-- お知らせ：notice.htmlへ -->
+      <a class="menu-card" href="notice.html">
         <div class="menu-icon">📢</div>
         <div>
           <div class="menu-title">
@@ -331,9 +350,10 @@
             長久寺からの最新のお知らせ
           </div>
         </div>
-      </div>
+      </a>
 
 
+      <!-- 以下はまだリンク未設定 -->
       <div class="menu-card">
         <div class="menu-icon">📅</div>
         <div>
@@ -430,9 +450,6 @@ let idToken = "";
 
 /*
  * GASへPOSTする共通処理
- *
- * text/plain にしているのは、ブラウザからGASへの通信で
- * 不要なCORS preflightを発生させにくくするため。
  */
 async function callApi(data) {
 
@@ -491,7 +508,7 @@ async function startLiff() {
 
 
     /*
-     * openidスコープによるIDトークン取得
+     * IDトークン取得
      */
     idToken =
       liff.getIDToken();
@@ -511,8 +528,7 @@ async function startLiff() {
 
 
     /*
-     * GASへIDトークンを送り、
-     * GAS側でLINE公式APIによる検証を行う
+     * GAS側でLINE公式APIによる検証
      */
     const result =
       await callApi({
