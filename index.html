@@ -1,76 +1,241 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
 
-  <title>長久寺 檀信徒認証</title>
+<meta charset="UTF-8">
 
-  <script
-    charset="utf-8"
-    src="https://static.line-scdn.net/liff/edge/2/sdk.js">
-  </script>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont,
-                   "Segoe UI", sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
+<title>長久寺 檀信徒認証</title>
 
-    .container {
-      max-width: 420px;
-      margin: 40px auto;
-      background: white;
-      padding: 30px 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      text-align: center;
-    }
+<script
+charset="utf-8"
+src="https://static.line-scdn.net/liff/edge/2/sdk.js">
+</script>
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
+<style>
 
-    #status {
-      margin-top: 25px;
-      line-height: 1.8;
-    }
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 
-    .success {
-      color: #16803c;
-      font-weight: bold;
-    }
+  background: #f5f5f5;
 
-    .error {
-      color: #c62828;
-      font-weight: bold;
-    }
-  </style>
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+
+  max-width: 420px;
+
+  margin: 40px auto;
+
+  background: white;
+
+  padding: 30px 24px;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 4px 20px rgba(0,0,0,0.08);
+}
+
+h1 {
+
+  text-align: center;
+
+  font-size: 24px;
+
+  margin-bottom: 10px;
+}
+
+.description {
+
+  text-align: center;
+
+  color: #666;
+
+  margin-bottom: 25px;
+}
+
+#status {
+
+  text-align: center;
+
+  line-height: 1.8;
+
+  margin: 20px 0;
+}
+
+.success {
+
+  color: #16803c;
+
+  font-weight: bold;
+}
+
+.error {
+
+  color: #c62828;
+
+  font-weight: bold;
+}
+
+.form-group {
+
+  margin-top: 18px;
+}
+
+label {
+
+  display: block;
+
+  font-weight: bold;
+
+  margin-bottom: 7px;
+}
+
+input {
+
+  box-sizing: border-box;
+
+  width: 100%;
+
+  padding: 13px;
+
+  border: 1px solid #ccc;
+
+  border-radius: 8px;
+
+  font-size: 16px;
+}
+
+button {
+
+  width: 100%;
+
+  margin-top: 24px;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #333;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+button:disabled {
+
+  opacity: 0.5;
+
+  cursor: default;
+}
+
+#registrationForm {
+
+  display: none;
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>長久寺 檀信徒認証</h1>
+<h1>長久寺 檀信徒認証</h1>
 
-    <p>LINEアカウントを確認しています。</p>
+<p class="description">
+LINEアカウントを確認しています。
+</p>
 
-    <div id="status">
-      LIFFを初期化しています…
-    </div>
 
-  </div>
+<div id="status">
+LIFFを初期化しています…
+</div>
+
+
+<div id="registrationForm">
+
+<div class="form-group">
+
+<label for="memberId">
+檀家番号
+</label>
+
+<input
+id="memberId"
+type="text"
+placeholder="例：C001"
+autocomplete="off">
+
+</div>
+
+
+<div class="form-group">
+
+<label for="verificationCode">
+確認コード
+</label>
+
+<input
+id="verificationCode"
+type="password"
+inputmode="numeric"
+placeholder="6桁の確認コード"
+autocomplete="off">
+
+</div>
+
+
+<button
+id="registerButton"
+onclick="registerMember()">
+
+認証する
+
+</button>
+
+</div>
+
+</div>
 
 
 <script>
 
-const LIFF_ID = "2011649394-wJceQFXt";
+const LIFF_ID =
+"2011649394-wJceQFXt";
+
+
+const GAS_URL =
+"https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
+
+
+let lineUserId = "";
+
+let lineDisplayName = "";
+
+
+/*
+ * LIFF開始
+ */
 
 async function startLiff() {
 
@@ -84,24 +249,34 @@ async function startLiff() {
       withLoginOnExternalBrowser: true
     });
 
+
     if (!liff.isLoggedIn()) {
+
       status.textContent =
         "LINEへログインします…";
 
       liff.login();
+
       return;
     }
+
 
     const profile =
       await liff.getProfile();
 
-    status.className = "success";
 
-    status.innerHTML =
-      "LIFFの起動に成功しました。<br><br>" +
-      profile.displayName +
-      " さん<br>" +
-      "LINEアカウントを確認できました。";
+    lineUserId =
+      profile.userId;
+
+    lineDisplayName =
+      profile.displayName;
+
+
+    status.textContent =
+      "登録状況を確認しています…";
+
+
+    await checkRegistration();
 
   }
 
@@ -109,19 +284,242 @@ async function startLiff() {
 
     console.error(error);
 
-    status.className = "error";
+    status.className =
+      "error";
 
     status.textContent =
-      "LIFFの初期化に失敗しました：" +
+      "LINE認証でエラーが発生しました：" +
       error.message;
 
   }
 
 }
 
+
+/*
+ * 既に登録済みか確認
+ */
+
+async function checkRegistration() {
+
+  const status =
+    document.getElementById("status");
+
+
+  try {
+
+    const url =
+      GAS_URL +
+      "?action=checkLine" +
+      "&lineUserId=" +
+      encodeURIComponent(lineUserId);
+
+
+    const response =
+      await fetch(url);
+
+
+    const result =
+      await response.json();
+
+
+    if (
+      result.success &&
+      result.registered
+    ) {
+
+      status.className =
+        "success";
+
+      status.innerHTML =
+        result.name +
+        " 様<br>" +
+        "認証済みです。";
+
+      return;
+    }
+
+
+    status.className = "";
+
+    status.innerHTML =
+      lineDisplayName +
+      " さん<br>" +
+      "檀家番号と確認コードを入力してください。";
+
+
+    document
+      .getElementById("registrationForm")
+      .style.display = "block";
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    status.className =
+      "error";
+
+    status.textContent =
+      "登録状況を確認できませんでした：" +
+      error.message;
+
+  }
+
+}
+
+
+/*
+ * 初回登録
+ */
+
+async function registerMember() {
+
+  const status =
+    document.getElementById("status");
+
+
+  const button =
+    document.getElementById(
+      "registerButton"
+    );
+
+
+  const memberId =
+    document
+      .getElementById("memberId")
+      .value
+      .trim();
+
+
+  const verificationCode =
+    document
+      .getElementById(
+        "verificationCode"
+      )
+      .value
+      .trim();
+
+
+  if (
+    !memberId ||
+    !verificationCode
+  ) {
+
+    status.className =
+      "error";
+
+    status.textContent =
+      "檀家番号と確認コードを入力してください。";
+
+    return;
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "認証しています…";
+
+
+  try {
+
+    const url =
+      GAS_URL +
+      "?action=register" +
+
+      "&memberId=" +
+      encodeURIComponent(memberId) +
+
+      "&verificationCode=" +
+      encodeURIComponent(
+        verificationCode
+      ) +
+
+      "&lineUserId=" +
+      encodeURIComponent(
+        lineUserId
+      ) +
+
+      "&lineDisplayName=" +
+      encodeURIComponent(
+        lineDisplayName
+      );
+
+
+    const response =
+      await fetch(url);
+
+
+    const result =
+      await response.json();
+
+
+    if (result.success) {
+
+      document
+        .getElementById(
+          "registrationForm"
+        )
+        .style.display =
+        "none";
+
+
+      status.className =
+        "success";
+
+
+      status.innerHTML =
+        result.name +
+        " 様<br><br>" +
+        "LINEアカウントの登録が完了しました。";
+
+    }
+
+    else {
+
+      status.className =
+        "error";
+
+      status.textContent =
+        result.message ||
+        "認証できませんでした.";
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    status.className =
+      "error";
+
+    status.textContent =
+      "通信エラーが発生しました：" +
+      error.message;
+
+  }
+
+  finally {
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "認証する";
+
+  }
+
+}
+
+
 startLiff();
 
 </script>
 
 </body>
+
 </html>
