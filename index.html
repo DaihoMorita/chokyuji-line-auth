@@ -1,219 +1,427 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>長久寺 檀信徒認証</title>
-
-<script
-charset="utf-8"
-src="https://static.line-scdn.net/liff/edge/2/sdk.js">
-</script>
-
-<style>
-
-body {
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
-  background: #f5f5f5;
-
-  margin: 0;
-  padding: 20px;
-}
-
-.container {
-
-  max-width: 420px;
-
-  margin: 40px auto;
-
-  background: white;
-
-  padding: 30px 24px;
-
-  border-radius: 16px;
-
-  box-shadow:
-    0 4px 20px rgba(0,0,0,0.08);
-}
-
-h1 {
-
-  text-align: center;
-
-  font-size: 24px;
-
-  margin-bottom: 10px;
-}
-
-.description {
-
-  text-align: center;
-
-  color: #666;
-
-  margin-bottom: 25px;
-}
-
-#status {
-
-  text-align: center;
-
-  line-height: 1.8;
-
-  margin: 20px 0;
-}
-
-.success {
-
-  color: #16803c;
-
-  font-weight: bold;
-}
-
-.error {
-
-  color: #c62828;
-
-  font-weight: bold;
-}
-
-.form-group {
-
-  margin-top: 18px;
-}
-
-label {
-
-  display: block;
-
-  font-weight: bold;
-
-  margin-bottom: 7px;
-}
-
-input {
-
-  box-sizing: border-box;
-
-  width: 100%;
-
-  padding: 13px;
-
-  border: 1px solid #ccc;
-
-  border-radius: 8px;
-
-  font-size: 16px;
-}
-
-button {
-
-  width: 100%;
-
-  margin-top: 24px;
-
-  padding: 14px;
-
-  border: none;
-
-  border-radius: 8px;
-
-  background: #333;
-
-  color: white;
-
-  font-size: 16px;
-
-  font-weight: bold;
-
-  cursor: pointer;
-}
-
-button:disabled {
-
-  opacity: 0.5;
-
-  cursor: default;
-}
-
-#registrationForm {
-
-  display: none;
-}
-
-</style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>長久寺 檀信徒専用ページ</title>
+
+  <script charset="utf-8"
+    src="https://static.line-scdn.net/liff/edge/2/sdk.js">
+  </script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #111;
+      color: #eee;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "Noto Sans JP",
+        sans-serif;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 18px 50px;
+    }
+
+    /* ---------- ヘッダー ---------- */
+
+    .header {
+      padding: 32px 4px 24px;
+      border-bottom: 1px solid #333;
+    }
+
+    .temple-name {
+      font-size: 13px;
+      color: #aaa;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 25px;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    /* ---------- 認証中 ---------- */
+
+    #statusArea {
+      margin-top: 35px;
+      padding: 28px 20px;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    #status {
+      line-height: 1.8;
+      color: #ccc;
+    }
+
+    .success {
+      color: #b8dfbd !important;
+    }
+
+    .error {
+      color: #ff9e9e !important;
+    }
+
+    /* ---------- 初回認証 ---------- */
+
+    #registrationForm {
+      display: none;
+      margin-top: 28px;
+    }
+
+    .auth-box {
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 24px 20px;
+    }
+
+    .auth-title {
+      font-size: 19px;
+      margin: 0 0 8px;
+    }
+
+    .auth-description {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 7px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      color: #fff;
+      background: #262626;
+      border: 1px solid #444;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #888;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      border: 0;
+      border-radius: 8px;
+      background: #eee;
+      color: #111;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .5;
+    }
+
+    /* ---------- ポータル ---------- */
+
+    #portal {
+      display: none;
+    }
+
+    .welcome {
+      padding: 30px 4px 24px;
+    }
+
+    .welcome-name {
+      font-size: 22px;
+      margin-bottom: 7px;
+    }
+
+    .welcome-text {
+      color: #aaa;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .section-title {
+      margin: 18px 0 14px;
+      font-size: 14px;
+      color: #aaa;
+      font-weight: normal;
+      letter-spacing: .08em;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .menu-card {
+      min-height: 125px;
+      padding: 18px;
+      background: #1b1b1b;
+      border: 1px solid #333;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-decoration: none;
+      color: #eee;
+    }
+
+    .menu-icon {
+      font-size: 27px;
+      margin-bottom: 18px;
+    }
+
+    .menu-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .menu-subtitle {
+      margin-top: 5px;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .notice {
+      margin-top: 28px;
+      padding: 18px;
+      background: #181818;
+      border-left: 3px solid #777;
+      color: #bbb;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    footer {
+      margin-top: 42px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+      text-align: center;
+      color: #777;
+      font-size: 12px;
+    }
+
+    @media (max-width: 380px) {
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
 <div class="container">
 
-<h1>長久寺 檀信徒認証</h1>
+  <header class="header">
+    <div class="temple-name">
+      曹洞宗 春日山
+    </div>
 
-<p class="description">
-LINEアカウントを確認しています。
-</p>
-
-
-<div id="status">
-LIFFを初期化しています…
-</div>
-
-
-<div id="registrationForm">
-
-<div class="form-group">
-
-<label for="memberId">
-檀家番号
-</label>
-
-<input
-id="memberId"
-type="text"
-placeholder="例：C001"
-autocomplete="off">
-
-</div>
+    <h1>
+      長久寺 檀信徒専用ページ
+    </h1>
+  </header>
 
 
-<div class="form-group">
-
-<label for="verificationCode">
-確認コード
-</label>
-
-<input
-id="verificationCode"
-type="password"
-inputmode="numeric"
-placeholder="6桁の確認コード"
-autocomplete="off">
-
-</div>
+  <!-- 認証状態 -->
+  <div id="statusArea">
+    <div id="status">
+      LINEアカウントを確認しています…
+    </div>
+  </div>
 
 
-<button
-id="registerButton"
-onclick="registerMember()">
+  <!-- 初回認証 -->
+  <div id="registrationForm">
 
-認証する
+    <div class="auth-box">
 
-</button>
+      <h2 class="auth-title">
+        初回認証
+      </h2>
 
-</div>
+      <div class="auth-description">
+        檀信徒専用ページをご利用いただくため、
+        初回のみ檀家番号と確認コードをご入力ください。
+      </div>
+
+      <label for="memberId">
+        檀家番号
+      </label>
+
+      <input
+        id="memberId"
+        type="text"
+        placeholder="例：C001"
+        autocomplete="off">
+
+      <label for="verificationCode">
+        確認コード
+      </label>
+
+      <input
+        id="verificationCode"
+        type="password"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="6桁の確認コード"
+        autocomplete="off">
+
+      <button
+        id="registerButton"
+        onclick="registerMember()">
+        認証する
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- 認証済みポータル -->
+  <main id="portal">
+
+    <div class="welcome">
+
+      <div
+        id="welcomeName"
+        class="welcome-name">
+      </div>
+
+      <div class="welcome-text">
+        長久寺 檀信徒専用ページへようこそ。<br>
+        お知らせや年間行事などをご覧いただけます。
+      </div>
+
+    </div>
+
+
+    <h2 class="section-title">
+      ご案内
+    </h2>
+
+
+    <div class="menu-grid">
+
+      <div class="menu-card">
+        <div class="menu-icon">📢</div>
+        <div>
+          <div class="menu-title">
+            お知らせ
+          </div>
+          <div class="menu-subtitle">
+            長久寺からの最新のお知らせ
+          </div>
+        </div>
+      </div>
+
+
+      <div class="menu-card">
+        <div class="menu-icon">📅</div>
+        <div>
+          <div class="menu-title">
+            年間行事
+          </div>
+          <div class="menu-subtitle">
+            法要・行事の予定
+          </div>
+        </div>
+      </div>
+
+
+      <div class="menu-card">
+        <div class="menu-icon">📰</div>
+        <div>
+          <div class="menu-title">
+            長久寺だより
+          </div>
+          <div class="menu-subtitle">
+            お寺からのお便り
+          </div>
+        </div>
+      </div>
+
+
+      <div class="menu-card">
+        <div class="menu-icon">🙏</div>
+        <div>
+          <div class="menu-title">
+            永代供養墓
+          </div>
+          <div class="menu-subtitle">
+            永代供養について
+          </div>
+        </div>
+      </div>
+
+
+      <div class="menu-card">
+        <div class="menu-icon">💬</div>
+        <div>
+          <div class="menu-title">
+            お問い合わせ・ご相談
+          </div>
+          <div class="menu-subtitle">
+            長久寺へのお問い合わせ
+          </div>
+        </div>
+      </div>
+
+
+      <div class="menu-card">
+        <div class="menu-icon">📱</div>
+        <div>
+          <div class="menu-title">
+            公式SNS
+          </div>
+          <div class="menu-subtitle">
+            長久寺の公式SNS
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="notice">
+      このページは長久寺の檀信徒専用ページです。
+      ページの内容や確認コード等を第三者へ共有しないよう
+      お願いいたします。
+    </div>
+
+
+    <footer>
+      曹洞宗 春日山 長久寺
+    </footer>
+
+  </main>
 
 </div>
 
@@ -221,22 +429,18 @@ onclick="registerMember()">
 <script>
 
 const LIFF_ID =
-"2011649394-wJceQFXt";
-
+  "2011649394-wJceQFXt";
 
 const GAS_URL =
-"https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
-
+  "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
 
 let lineUserId = "";
-
 let lineDisplayName = "";
 
 
 /*
- * LIFF開始
+ * LIFF起動
  */
-
 async function startLiff() {
 
   const status =
@@ -248,7 +452,6 @@ async function startLiff() {
       liffId: LIFF_ID,
       withLoginOnExternalBrowser: true
     });
-
 
     if (!liff.isLoggedIn()) {
 
@@ -264,7 +467,6 @@ async function startLiff() {
     const profile =
       await liff.getProfile();
 
-
     lineUserId =
       profile.userId;
 
@@ -273,7 +475,7 @@ async function startLiff() {
 
 
     status.textContent =
-      "登録状況を確認しています…";
+      "檀信徒登録を確認しています…";
 
 
     await checkRegistration();
@@ -288,8 +490,7 @@ async function startLiff() {
       "error";
 
     status.textContent =
-      "LINE認証でエラーが発生しました：" +
-      error.message;
+      "LINE認証に失敗しました。";
 
   }
 
@@ -297,14 +498,12 @@ async function startLiff() {
 
 
 /*
- * 既に登録済みか確認
+ * 登録済み確認
  */
-
 async function checkRegistration() {
 
   const status =
     document.getElementById("status");
-
 
   try {
 
@@ -328,24 +527,17 @@ async function checkRegistration() {
       result.registered
     ) {
 
-      status.className =
-        "success";
-
-      status.innerHTML =
-        result.name +
-        " 様<br>" +
-        "認証済みです。";
+      showPortal(
+        result.name
+      );
 
       return;
     }
 
 
-    status.className = "";
-
-    status.innerHTML =
-      lineDisplayName +
-      " さん<br>" +
-      "檀家番号と確認コードを入力してください。";
+    document
+      .getElementById("statusArea")
+      .style.display = "none";
 
 
     document
@@ -362,8 +554,7 @@ async function checkRegistration() {
       "error";
 
     status.textContent =
-      "登録状況を確認できませんでした：" +
-      error.message;
+      "登録状況を確認できませんでした。";
 
   }
 
@@ -373,18 +564,7 @@ async function checkRegistration() {
 /*
  * 初回登録
  */
-
 async function registerMember() {
-
-  const status =
-    document.getElementById("status");
-
-
-  const button =
-    document.getElementById(
-      "registerButton"
-    );
-
 
   const memberId =
     document
@@ -395,11 +575,15 @@ async function registerMember() {
 
   const verificationCode =
     document
-      .getElementById(
-        "verificationCode"
-      )
+      .getElementById("verificationCode")
       .value
       .trim();
+
+
+  const button =
+    document.getElementById(
+      "registerButton"
+    );
 
 
   if (
@@ -407,11 +591,9 @@ async function registerMember() {
     !verificationCode
   ) {
 
-    status.className =
-      "error";
-
-    status.textContent =
-      "檀家番号と確認コードを入力してください。";
+    alert(
+      "檀家番号と確認コードを入力してください。"
+    );
 
     return;
   }
@@ -466,25 +648,18 @@ async function registerMember() {
         "none";
 
 
-      status.className =
-        "success";
-
-
-      status.innerHTML =
-        result.name +
-        " 様<br><br>" +
-        "LINEアカウントの登録が完了しました。";
+      showPortal(
+        result.name
+      );
 
     }
 
     else {
 
-      status.className =
-        "error";
-
-      status.textContent =
+      alert(
         result.message ||
-        "認証できませんでした.";
+        "認証できませんでした。"
+      );
 
     }
 
@@ -494,19 +669,15 @@ async function registerMember() {
 
     console.error(error);
 
-    status.className =
-      "error";
-
-    status.textContent =
-      "通信エラーが発生しました：" +
-      error.message;
+    alert(
+      "通信エラーが発生しました。"
+    );
 
   }
 
   finally {
 
-    button.disabled =
-      false;
+    button.disabled = false;
 
     button.textContent =
       "認証する";
@@ -516,10 +687,40 @@ async function registerMember() {
 }
 
 
+/*
+ * ポータル表示
+ */
+function showPortal(name) {
+
+  document
+    .getElementById("statusArea")
+    .style.display =
+    "none";
+
+
+  document
+    .getElementById("registrationForm")
+    .style.display =
+    "none";
+
+
+  document
+    .getElementById("welcomeName")
+    .textContent =
+    name + " 様、ようこそ";
+
+
+  document
+    .getElementById("portal")
+    .style.display =
+    "block";
+
+}
+
+
 startLiff();
 
 </script>
 
 </body>
-
 </html>
