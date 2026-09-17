@@ -2,16 +2,22 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
 
-  <title>お知らせ｜長久寺 檀信徒専用ページ</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-  <script charset="utf-8"
+  <title>
+    お知らせ｜長久寺 檀信徒専用ページ
+  </title>
+
+  <script
+    charset="utf-8"
     src="https://static.line-scdn.net/liff/edge/2/sdk.js">
   </script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -19,7 +25,8 @@
     body {
       margin: 0;
       background: #101010;
-      color: #eee;
+      color: #eeeeee;
+
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -35,9 +42,9 @@
     }
 
     .temple-name {
-      color: #9b9b9b;
+      color: #999999;
       font-size: 14px;
-      letter-spacing: .12em;
+      letter-spacing: 0.12em;
       margin-bottom: 14px;
     }
 
@@ -50,22 +57,25 @@
     .line {
       height: 1px;
       background: #383838;
-      margin: 32px 0 36px;
+      margin: 32px 0 32px;
     }
 
     #loading {
       padding: 30px 0;
-      color: #aaa;
+      color: #aaaaaa;
       font-size: 15px;
       line-height: 1.8;
     }
 
     #error {
       display: none;
+
       background: #1b1b1b;
       border: 1px solid #383838;
       border-radius: 14px;
+
       padding: 25px 20px;
+
       color: #ef9a9a;
       line-height: 1.8;
       text-align: center;
@@ -76,69 +86,177 @@
     }
 
     .welcome {
-      color: #aaa;
+      color: #aaaaaa;
       font-size: 14px;
-      margin-bottom: 28px;
+      margin-bottom: 34px;
     }
 
-    #noticeList {
+    /*
+     * セクション
+     */
+    .notice-section {
+      margin-bottom: 42px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      margin-bottom: 16px;
+
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .section-icon {
+      font-size: 21px;
+    }
+
+    .section-description {
+      color: #888888;
+      font-size: 13px;
+      line-height: 1.7;
+
+      margin-top: -7px;
+      margin-bottom: 18px;
+    }
+
+    /*
+     * 個別案内セクション
+     */
+    #personalSection {
+      display: none;
+    }
+
+    #personalSection .section-heading {
+      color: #f2f2f2;
+    }
+
+    /*
+     * お知らせ一覧
+     */
+    .notice-list {
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
+    /*
+     * 通常カード
+     */
     .notice-card {
       background: #1b1b1b;
       border: 1px solid #383838;
       border-radius: 14px;
+
       padding: 22px 20px;
     }
 
+    /*
+     * 個別案内カード
+     */
+    .notice-card.personal {
+      background: #202020;
+      border: 1px solid #555555;
+    }
+
+    .personal-label {
+      display: inline-block;
+
+      margin-bottom: 12px;
+      padding: 5px 9px;
+
+      background: #333333;
+      border-radius: 6px;
+
+      color: #dddddd;
+
+      font-size: 11px;
+      font-weight: 600;
+
+      letter-spacing: 0.05em;
+    }
+
     .notice-date {
-      color: #888;
+      color: #888888;
       font-size: 13px;
       margin-bottom: 9px;
     }
 
     .notice-title {
-      color: #eee;
+      color: #eeeeee;
+
       font-size: 18px;
       font-weight: 700;
       line-height: 1.5;
+
       margin-bottom: 10px;
     }
 
     .notice-body {
-      color: #bbb;
+      color: #bbbbbb;
+
       font-size: 15px;
-      line-height: 1.8;
+      line-height: 1.85;
+
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
 
+    /*
+     * お知らせなし
+     */
     .empty {
       background: #1b1b1b;
       border: 1px solid #383838;
       border-radius: 14px;
-      padding: 30px 20px;
-      color: #999;
+
+      padding: 28px 20px;
+
+      color: #888888;
+
       text-align: center;
       line-height: 1.8;
     }
 
+    /*
+     * 戻る
+     */
     .back {
       display: inline-block;
-      margin-top: 34px;
-      color: #bbb;
+
+      margin-top: 12px;
+
+      color: #bbbbbb;
+
       text-decoration: none;
       font-size: 14px;
     }
 
     .back:hover {
-      color: #fff;
+      color: #ffffff;
+    }
+
+    /*
+     * 注意書き
+     */
+    .privacy-note {
+      margin-top: 36px;
+
+      padding: 16px 17px;
+
+      background: #171717;
+      border-left: 3px solid #555555;
+
+      color: #888888;
+
+      font-size: 12px;
+      line-height: 1.7;
     }
 
     @media (max-width: 600px) {
+
       .page {
         padding:
           34px 20px
@@ -152,9 +270,16 @@
       .notice-card {
         padding: 20px 18px;
       }
+
+      .section-heading {
+        font-size: 18px;
+      }
+
     }
+
   </style>
 </head>
+
 
 <body>
 
@@ -164,19 +289,24 @@
     曹洞宗 春日山 長久寺
   </div>
 
-  <h1>お知らせ</h1>
+  <h1>
+    お知らせ
+  </h1>
 
   <div class="line"></div>
 
 
+  <!-- 読み込み中 -->
   <div id="loading">
     お知らせを確認しています…
   </div>
 
 
+  <!-- エラー -->
   <div id="error"></div>
 
 
+  <!-- 認証後 -->
   <div id="content">
 
     <div
@@ -184,13 +314,82 @@
       class="welcome">
     </div>
 
-    <div id="noticeList"></div>
+
+    <!-- =========================
+         個別案内
+         ========================= -->
+
+    <section
+      id="personalSection"
+      class="notice-section">
+
+      <div class="section-heading">
+
+        <span class="section-icon">
+          ✉️
+        </span>
+
+        <span>
+          あなたへのご案内
+        </span>
+
+      </div>
+
+      <div class="section-description">
+        長久寺から個別にお送りしているご案内です。
+      </div>
+
+      <div
+        id="personalNoticeList"
+        class="notice-list">
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         全体のお知らせ
+         ========================= -->
+
+    <section
+      class="notice-section">
+
+      <div class="section-heading">
+
+        <span class="section-icon">
+          📢
+        </span>
+
+        <span>
+          長久寺からのお知らせ
+        </span>
+
+      </div>
+
+      <div class="section-description">
+        檀信徒の皆様へのお知らせです。
+      </div>
+
+      <div
+        id="generalNoticeList"
+        class="notice-list">
+      </div>
+
+    </section>
+
 
     <a
       class="back"
       href="./">
       ← 檀信徒専用ページへ戻る
     </a>
+
+
+    <div class="privacy-note">
+      「あなたへのご案内」には、
+      個別のご連絡が表示される場合があります。
+      内容を第三者へ共有しないようお願いいたします。
+    </div>
 
   </div>
 
@@ -201,6 +400,7 @@
 
 const LIFF_ID =
   "2011649394-wJceQFXt";
+
 
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
@@ -215,7 +415,8 @@ async function callApi(data) {
     await fetch(
       GAS_URL,
       {
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
           "Content-Type":
@@ -242,12 +443,16 @@ async function callApi(data) {
 
 
   return await response.json();
+
 }
 
 
 /*
- * HTMLとして解釈させず、
- * テキストとして安全に表示する。
+ * 安全にテキスト要素を作成
+ *
+ * innerHTMLを使用しないことで、
+ * スプレッドシートにHTML等が入力されても
+ * そのまま実行されないようにする。
  */
 function createTextElement(
   tagName,
@@ -270,23 +475,188 @@ function createTextElement(
 
 
   return element;
+
 }
 
 
 /*
- * お知らせ一覧を描画
+ * お知らせカード作成
  */
-function renderNotices(notices) {
+function createNoticeCard(
+  notice,
+  personal
+) {
 
-  const noticeList =
-    document.getElementById(
-      "noticeList"
+  const card =
+    document.createElement(
+      "article"
     );
 
 
-  noticeList.replaceChildren();
+  card.className =
+    personal
+      ? "notice-card personal"
+      : "notice-card";
 
 
+  /*
+   * 個別案内ラベル
+   */
+  if (personal) {
+
+    const label =
+      document.createElement(
+        "div"
+      );
+
+
+    label.className =
+      "personal-label";
+
+
+    label.textContent =
+      "個別のご案内";
+
+
+    card.appendChild(
+      label
+    );
+
+  }
+
+
+  /*
+   * 日付
+   */
+  if (notice.date) {
+
+    card.appendChild(
+      createTextElement(
+        "div",
+        "notice-date",
+        notice.date
+      )
+    );
+
+  }
+
+
+  /*
+   * タイトル
+   */
+  if (notice.title) {
+
+    card.appendChild(
+      createTextElement(
+        "div",
+        "notice-title",
+        notice.title
+      )
+    );
+
+  }
+
+
+  /*
+   * 本文
+   */
+  if (notice.body) {
+
+    card.appendChild(
+      createTextElement(
+        "div",
+        "notice-body",
+        notice.body
+      )
+    );
+
+  }
+
+
+  return card;
+
+}
+
+
+/*
+ * 個別案内を表示
+ */
+function renderPersonalNotices(
+  notices
+) {
+
+  const section =
+    document.getElementById(
+      "personalSection"
+    );
+
+
+  const list =
+    document.getElementById(
+      "personalNoticeList"
+    );
+
+
+  list.replaceChildren();
+
+
+  /*
+   * 個別案内が0件なら
+   * セクション自体を表示しない
+   */
+  if (
+    !Array.isArray(notices) ||
+    notices.length === 0
+  ) {
+
+    section.style.display =
+      "none";
+
+
+    return;
+
+  }
+
+
+  notices.forEach(
+    function(notice) {
+
+      list.appendChild(
+        createNoticeCard(
+          notice,
+          true
+        )
+      );
+
+    }
+  );
+
+
+  section.style.display =
+    "block";
+
+}
+
+
+/*
+ * 全体のお知らせを表示
+ */
+function renderGeneralNotices(
+  notices
+) {
+
+  const list =
+    document.getElementById(
+      "generalNoticeList"
+    );
+
+
+  list.replaceChildren();
+
+
+  /*
+   * 全体のお知らせが0件
+   */
   if (
     !Array.isArray(notices) ||
     notices.length === 0
@@ -306,78 +676,24 @@ function renderNotices(notices) {
       "現在、公開中のお知らせはありません。";
 
 
-    noticeList.appendChild(
+    list.appendChild(
       empty
     );
 
 
     return;
+
   }
 
 
   notices.forEach(
     function(notice) {
 
-      const card =
-        document.createElement(
-          "article"
-        );
-
-
-      card.className =
-        "notice-card";
-
-
-      /*
-       * 日付
-       */
-      if (notice.date) {
-
-        card.appendChild(
-          createTextElement(
-            "div",
-            "notice-date",
-            notice.date
-          )
-        );
-
-      }
-
-
-      /*
-       * タイトル
-       */
-      if (notice.title) {
-
-        card.appendChild(
-          createTextElement(
-            "div",
-            "notice-title",
-            notice.title
-          )
-        );
-
-      }
-
-
-      /*
-       * 本文
-       */
-      if (notice.body) {
-
-        card.appendChild(
-          createTextElement(
-            "div",
-            "notice-body",
-            notice.body
-          )
-        );
-
-      }
-
-
-      noticeList.appendChild(
-        card
+      list.appendChild(
+        createNoticeCard(
+          notice,
+          false
+        )
       );
 
     }
@@ -415,11 +731,13 @@ async function start() {
      * LIFF初期化
      */
     await liff.init({
+
       liffId:
         LIFF_ID,
 
       withLoginOnExternalBrowser:
         true
+
     });
 
 
@@ -439,11 +757,12 @@ async function start() {
 
 
       return;
+
     }
 
 
     /*
-     * IDトークン取得
+     * LINE IDトークン取得
      */
     const idToken =
       liff.getIDToken();
@@ -463,12 +782,17 @@ async function start() {
 
 
     /*
-     * GASに
-     * 「お知らせを取得」
-     * と依頼する。
+     * GASへお知らせ取得依頼
      *
-     * GAS側でLINE認証と
-     * 檀家マスターの有効状態も確認する。
+     * GAS側で
+     *
+     * ・LINE IDトークン検証
+     * ・檀家マスター照合
+     * ・有効状態確認
+     * ・本人の檀家番号確認
+     * ・対象のお知らせ抽出
+     *
+     * を行う。
      */
     const result =
       await callApi({
@@ -493,7 +817,7 @@ async function start() {
 
 
     /*
-     * 認証済み檀家名
+     * 認証された檀家名
      */
     document
       .getElementById(
@@ -505,13 +829,24 @@ async function start() {
 
 
     /*
-     * お知らせ表示
+     * 個別案内
      */
-    renderNotices(
-      result.notices
+    renderPersonalNotices(
+      result.personalNotices
     );
 
 
+    /*
+     * 全体のお知らせ
+     */
+    renderGeneralNotices(
+      result.generalNotices
+    );
+
+
+    /*
+     * 表示切替
+     */
     loading.style.display =
       "none";
 
