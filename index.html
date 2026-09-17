@@ -34,8 +34,6 @@
       padding: 24px 18px 50px;
     }
 
-    /* ---------- ヘッダー ---------- */
-
     .header {
       padding: 32px 4px 24px;
       border-bottom: 1px solid #333;
@@ -44,7 +42,7 @@
     .temple-name {
       font-size: 13px;
       color: #aaa;
-      letter-spacing: 0.15em;
+      letter-spacing: .15em;
       margin-bottom: 8px;
     }
 
@@ -53,8 +51,6 @@
       margin: 0;
       font-weight: 600;
     }
-
-    /* ---------- 認証中 ---------- */
 
     #statusArea {
       margin-top: 35px;
@@ -68,6 +64,7 @@
     #status {
       line-height: 1.8;
       color: #ccc;
+      word-break: break-word;
     }
 
     .success {
@@ -77,8 +74,6 @@
     .error {
       color: #ff9e9e !important;
     }
-
-    /* ---------- 初回認証 ---------- */
 
     #registrationForm {
       display: none;
@@ -141,9 +136,8 @@
 
     button:disabled {
       opacity: .5;
+      cursor: default;
     }
-
-    /* ---------- ポータル ---------- */
 
     #portal {
       display: none;
@@ -187,8 +181,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      text-decoration: none;
       color: #eee;
+      text-decoration: none;
     }
 
     .menu-icon {
@@ -250,7 +244,6 @@
   </header>
 
 
-  <!-- 認証状態 -->
   <div id="statusArea">
     <div id="status">
       LINEアカウントを確認しています…
@@ -258,7 +251,6 @@
   </div>
 
 
-  <!-- 初回認証 -->
   <div id="registrationForm">
 
     <div class="auth-box">
@@ -305,7 +297,6 @@
   </div>
 
 
-  <!-- 認証済みポータル -->
   <main id="portal">
 
     <div class="welcome">
@@ -434,8 +425,42 @@ const LIFF_ID =
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
 
-let lineUserId = "";
-let lineDisplayName = "";
+let idToken = "";
+
+
+/*
+ * GASへPOSTする共通処理
+ *
+ * text/plain にしているのは、ブラウザからGASへの通信で
+ * 不要なCORS preflightを発生させにくくするため。
+ */
+async function callApi(data) {
+
+  const response =
+    await fetch(GAS_URL, {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "text/plain;charset=utf-8"
+      },
+
+      body:
+        JSON.stringify(data),
+
+      redirect: "follow"
+    });
+
+
+  if (!response.ok) {
+    throw new Error(
+      "HTTP " + response.status
+    );
+  }
+
+
+  return await response.json();
+}
 
 
 /*
@@ -453,6 +478,7 @@ async function startLiff() {
       withLoginOnExternalBrowser: true
     });
 
+
     if (!liff.isLoggedIn()) {
 
       status.textContent =
@@ -464,68 +490,51 @@ async function startLiff() {
     }
 
 
-    const profile =
-      await liff.getProfile();
+    /*
+     * openidスコープによるIDトークン取得
+     */
+    idToken =
+      liff.getIDToken();
 
-    lineUserId =
-      profile.userId;
 
-    lineDisplayName =
-      profile.displayName;
+    if (!idToken) {
+
+      throw new Error(
+        "IDトークンを取得できませんでした。"
+      );
+
+    }
 
 
     status.textContent =
       "檀信徒登録を確認しています…";
 
 
-    await checkRegistration();
-
-  }
-
-  catch (error) {
-
-    console.error(error);
-
-    status.className =
-      "error";
-
-    status.textContent =
-      "LINE認証に失敗しました。";
-
-  }
-
-}
-
-
-/*
- * 登録済み確認
- */
-async function checkRegistration() {
-
-  const status =
-    document.getElementById("status");
-
-  try {
-
-    const url =
-      GAS_URL +
-      "?action=checkLine" +
-      "&lineUserId=" +
-      encodeURIComponent(lineUserId);
-
-
-    const response =
-      await fetch(url);
-
-
+    /*
+     * GASへIDトークンを送り、
+     * GAS側でLINE公式APIによる検証を行う
+     */
     const result =
-      await response.json();
+      await callApi({
+        action: "check",
+        idToken: idToken
+      });
 
 
-    if (
-      result.success &&
-      result.registered
-    ) {
+    if (!result.success) {
+
+      throw new Error(
+        result.message ||
+        "LINEアカウントを確認できませんでした。"
+      );
+
+    }
+
+
+    /*
+     * 登録済み
+     */
+    if (result.registered) {
 
       showPortal(
         result.name
@@ -535,18 +544,22 @@ async function checkRegistration() {
     }
 
 
+    /*
+     * 未登録
+     */
     document
       .getElementById("statusArea")
-      .style.display = "none";
+      .style.display =
+      "none";
 
 
     document
       .getElementById("registrationForm")
-      .style.display = "block";
+      .style.display =
+      "block";
 
-  }
 
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -554,7 +567,9 @@ async function checkRegistration() {
       "error";
 
     status.textContent =
-      "登録状況を確認できませんでした。";
+      "認証に失敗しました。" +
+      "\n" +
+      (error.message || "");
 
   }
 
@@ -562,7 +577,7 @@ async function checkRegistration() {
 
 
 /*
- * 初回登録
+ * 初回檀家登録
  */
 async function registerMember() {
 
@@ -575,7 +590,9 @@ async function registerMember() {
 
   const verificationCode =
     document
-      .getElementById("verificationCode")
+      .getElementById(
+        "verificationCode"
+      )
       .value
       .trim();
 
@@ -607,75 +624,58 @@ async function registerMember() {
 
   try {
 
-    const url =
-      GAS_URL +
-      "?action=register" +
-
-      "&memberId=" +
-      encodeURIComponent(memberId) +
-
-      "&verificationCode=" +
-      encodeURIComponent(
-        verificationCode
-      ) +
-
-      "&lineUserId=" +
-      encodeURIComponent(
-        lineUserId
-      ) +
-
-      "&lineDisplayName=" +
-      encodeURIComponent(
-        lineDisplayName
-      );
-
-
-    const response =
-      await fetch(url);
-
-
     const result =
-      await response.json();
+      await callApi({
+
+        action:
+          "register",
+
+        idToken:
+          idToken,
+
+        memberId:
+          memberId,
+
+        verificationCode:
+          verificationCode
+
+      });
 
 
-    if (result.success) {
-
-      document
-        .getElementById(
-          "registrationForm"
-        )
-        .style.display =
-        "none";
-
-
-      showPortal(
-        result.name
-      );
-
-    }
-
-    else {
+    if (!result.success) {
 
       alert(
         result.message ||
         "認証できませんでした。"
       );
 
+      return;
     }
 
-  }
 
-  catch (error) {
+    document
+      .getElementById(
+        "registrationForm"
+      )
+      .style.display =
+      "none";
+
+
+    showPortal(
+      result.name
+    );
+
+
+  } catch (error) {
 
     console.error(error);
 
     alert(
-      "通信エラーが発生しました。"
+      "通信エラーが発生しました。\n" +
+      (error.message || "")
     );
 
-  }
-
-  finally {
+  } finally {
 
     button.disabled = false;
 
@@ -688,7 +688,7 @@ async function registerMember() {
 
 
 /*
- * ポータル表示
+ * 認証済みポータルを表示
  */
 function showPortal(name) {
 
@@ -699,13 +699,17 @@ function showPortal(name) {
 
 
   document
-    .getElementById("registrationForm")
+    .getElementById(
+      "registrationForm"
+    )
     .style.display =
     "none";
 
 
   document
-    .getElementById("welcomeName")
+    .getElementById(
+      "welcomeName"
+    )
     .textContent =
     name + " 様、ようこそ";
 
