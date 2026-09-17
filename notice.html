@@ -2,12 +2,12 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <title>お知らせ｜長久寺 檀信徒専用ページ</title>
 
-  <script
-    charset="utf-8"
+  <script charset="utf-8"
     src="https://static.line-scdn.net/liff/edge/2/sdk.js">
   </script>
 
@@ -19,7 +19,7 @@
     body {
       margin: 0;
       background: #101010;
-      color: #eeeeee;
+      color: #eee;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -36,36 +36,36 @@
 
     .temple-name {
       color: #9b9b9b;
-      font-size: 17px;
-      letter-spacing: 0.12em;
-      margin-bottom: 20px;
+      font-size: 14px;
+      letter-spacing: .12em;
+      margin-bottom: 14px;
     }
 
     h1 {
       margin: 0;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 700;
-      letter-spacing: 0.03em;
     }
 
     .line {
       height: 1px;
       background: #383838;
-      margin: 38px 0 48px;
+      margin: 32px 0 36px;
     }
 
     #loading {
       padding: 30px 0;
-      color: #aaaaaa;
-      font-size: 16px;
+      color: #aaa;
+      font-size: 15px;
+      line-height: 1.8;
     }
 
     #error {
       display: none;
       background: #1b1b1b;
       border: 1px solid #383838;
-      border-radius: 18px;
-      padding: 28px 24px;
+      border-radius: 14px;
+      padding: 25px 20px;
       color: #ef9a9a;
       line-height: 1.8;
       text-align: center;
@@ -76,59 +76,81 @@
     }
 
     .welcome {
-      color: #aaaaaa;
-      font-size: 15px;
-      margin-bottom: 32px;
+      color: #aaa;
+      font-size: 14px;
+      margin-bottom: 28px;
     }
 
-    .notice {
-      display: block;
+    #noticeList {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .notice-card {
       background: #1b1b1b;
       border: 1px solid #383838;
-      border-radius: 18px;
-      padding: 24px;
-      margin-bottom: 18px;
+      border-radius: 14px;
+      padding: 22px 20px;
     }
 
     .notice-date {
-      color: #8f8f8f;
-      font-size: 14px;
-      margin-bottom: 10px;
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 9px;
     }
 
     .notice-title {
-      font-size: 20px;
+      color: #eee;
+      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 12px;
+      line-height: 1.5;
+      margin-bottom: 10px;
     }
 
-    .notice-text {
-      color: #bdbdbd;
-      font-size: 16px;
+    .notice-body {
+      color: #bbb;
+      font-size: 15px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      background: #1b1b1b;
+      border: 1px solid #383838;
+      border-radius: 14px;
+      padding: 30px 20px;
+      color: #999;
+      text-align: center;
       line-height: 1.8;
     }
 
     .back {
       display: inline-block;
-      margin-top: 32px;
-      color: #bbbbbb;
+      margin-top: 34px;
+      color: #bbb;
       text-decoration: none;
-      font-size: 15px;
+      font-size: 14px;
     }
 
     .back:hover {
-      color: white;
+      color: #fff;
     }
 
     @media (max-width: 600px) {
       .page {
         padding:
-          38px 30px
-          calc(70px + env(safe-area-inset-bottom));
+          34px 20px
+          calc(60px + env(safe-area-inset-bottom));
       }
 
       h1 {
-        font-size: 30px;
+        font-size: 27px;
+      }
+
+      .notice-card {
+        padding: 20px 18px;
       }
     }
   </style>
@@ -136,56 +158,43 @@
 
 <body>
 
-  <main class="page">
+<main class="page">
 
-    <div class="temple-name">
-      曹洞宗 春日山
+  <div class="temple-name">
+    曹洞宗 春日山 長久寺
+  </div>
+
+  <h1>お知らせ</h1>
+
+  <div class="line"></div>
+
+
+  <div id="loading">
+    お知らせを確認しています…
+  </div>
+
+
+  <div id="error"></div>
+
+
+  <div id="content">
+
+    <div
+      id="welcome"
+      class="welcome">
     </div>
 
-    <h1>お知らせ</h1>
+    <div id="noticeList"></div>
 
-    <div class="line"></div>
+    <a
+      class="back"
+      href="./">
+      ← 檀信徒専用ページへ戻る
+    </a>
 
-    <div id="loading">
-      LINEアカウントを確認しています…
-    </div>
+  </div>
 
-    <div id="error"></div>
-
-    <div id="content">
-
-      <div id="welcome" class="welcome"></div>
-
-      <!--
-        ↓↓↓ お知らせはここに追加していく ↓↓↓
-      -->
-
-      <article class="notice">
-        <div class="notice-date">
-          2026年9月18日
-        </div>
-
-        <div class="notice-title">
-          檀信徒専用ページを開設しました
-        </div>
-
-        <div class="notice-text">
-          長久寺檀信徒の皆様へのお知らせを、
-          こちらのページからご覧いただけるようになりました。
-        </div>
-      </article>
-
-      <!--
-        ↑↑↑ お知らせはここまで ↑↑↑
-      -->
-
-      <a class="back" href="./">
-        ← 檀信徒専用ページへ戻る
-      </a>
-
-    </div>
-
-  </main>
+</main>
 
 
 <script>
@@ -197,16 +206,208 @@ const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
 
 
+/*
+ * GASへPOST
+ */
+async function callApi(data) {
+
+  const response =
+    await fetch(
+      GAS_URL,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body:
+          JSON.stringify(data),
+
+        redirect:
+          "follow"
+      }
+    );
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "HTTP " +
+      response.status
+    );
+
+  }
+
+
+  return await response.json();
+}
+
+
+/*
+ * HTMLとして解釈させず、
+ * テキストとして安全に表示する。
+ */
+function createTextElement(
+  tagName,
+  className,
+  text
+) {
+
+  const element =
+    document.createElement(
+      tagName
+    );
+
+
+  element.className =
+    className;
+
+
+  element.textContent =
+    text || "";
+
+
+  return element;
+}
+
+
+/*
+ * お知らせ一覧を描画
+ */
+function renderNotices(notices) {
+
+  const noticeList =
+    document.getElementById(
+      "noticeList"
+    );
+
+
+  noticeList.replaceChildren();
+
+
+  if (
+    !Array.isArray(notices) ||
+    notices.length === 0
+  ) {
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+
+    empty.className =
+      "empty";
+
+
+    empty.textContent =
+      "現在、公開中のお知らせはありません。";
+
+
+    noticeList.appendChild(
+      empty
+    );
+
+
+    return;
+  }
+
+
+  notices.forEach(
+    function(notice) {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "notice-card";
+
+
+      /*
+       * 日付
+       */
+      if (notice.date) {
+
+        card.appendChild(
+          createTextElement(
+            "div",
+            "notice-date",
+            notice.date
+          )
+        );
+
+      }
+
+
+      /*
+       * タイトル
+       */
+      if (notice.title) {
+
+        card.appendChild(
+          createTextElement(
+            "div",
+            "notice-title",
+            notice.title
+          )
+        );
+
+      }
+
+
+      /*
+       * 本文
+       */
+      if (notice.body) {
+
+        card.appendChild(
+          createTextElement(
+            "div",
+            "notice-body",
+            notice.body
+          )
+        );
+
+      }
+
+
+      noticeList.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/*
+ * ページ起動
+ */
 async function start() {
 
   const loading =
-    document.getElementById("loading");
+    document.getElementById(
+      "loading"
+    );
 
-  const content =
-    document.getElementById("content");
 
   const errorBox =
-    document.getElementById("error");
+    document.getElementById(
+      "error"
+    );
+
+
+  const content =
+    document.getElementById(
+      "content"
+    );
+
 
   try {
 
@@ -214,23 +415,28 @@ async function start() {
      * LIFF初期化
      */
     await liff.init({
-      liffId: LIFF_ID,
-      withLoginOnExternalBrowser: true
+      liffId:
+        LIFF_ID,
+
+      withLoginOnExternalBrowser:
+        true
     });
 
 
     /*
-     * 未ログインならLINEログイン
+     * LINE未ログイン
      */
     if (!liff.isLoggedIn()) {
 
       loading.textContent =
         "LINEへログインします…";
 
+
       liff.login({
         redirectUri:
           window.location.href
       });
+
 
       return;
     }
@@ -252,78 +458,63 @@ async function start() {
     }
 
 
+    loading.textContent =
+      "檀信徒登録を確認しています…";
+
+
     /*
-     * GASへ登録状況を問い合わせ
+     * GASに
+     * 「お知らせを取得」
+     * と依頼する。
+     *
+     * GAS側でLINE認証と
+     * 檀家マスターの有効状態も確認する。
      */
-    const response =
-      await fetch(
-        GAS_URL,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
-          },
-
-          body: JSON.stringify({
-            action: "check",
-            idToken: idToken
-          })
-        }
-      );
-
-
     const result =
-      await response.json();
+      await callApi({
+
+        action:
+          "notices",
+
+        idToken:
+          idToken
+
+      });
 
 
-    /*
-     * API自体でエラー
-     */
     if (!result.success) {
 
       throw new Error(
         result.message ||
-        "認証に失敗しました。"
+        "お知らせを取得できませんでした。"
       );
 
     }
 
 
     /*
-     * 登録されていない、または無効
+     * 認証済み檀家名
      */
-    if (!result.registered) {
-
-      loading.style.display =
-        "none";
-
-      errorBox.style.display =
-        "block";
-
-      errorBox.innerHTML =
-        "このLINEアカウントでは、" +
-        "檀信徒専用ページをご利用いただけません。" +
-        "<br><br>" +
-        "トップページから認証を行ってください。";
-
-      return;
-    }
-
-
-    /*
-     * 認証成功
-     */
-    document.getElementById(
-      "welcome"
-    ).textContent =
+    document
+      .getElementById(
+        "welcome"
+      )
+      .textContent =
       result.name +
       " 様";
 
 
+    /*
+     * お知らせ表示
+     */
+    renderNotices(
+      result.notices
+    );
+
+
     loading.style.display =
       "none";
+
 
     content.style.display =
       "block";
@@ -333,16 +524,19 @@ async function start() {
 
     console.error(error);
 
+
     loading.style.display =
       "none";
+
 
     errorBox.style.display =
       "block";
 
+
     errorBox.textContent =
-      "認証処理中にエラーが発生しました。" +
+      "お知らせを表示できませんでした。" +
       "（" +
-      error.message +
+      (error.message || "") +
       "）";
 
   }
