@@ -7,9 +7,7 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0">
 
-  <title>
-    お知らせ｜長久寺 檀信徒専用ページ
-  </title>
+  <title>お知らせ｜長久寺 檀信徒専用ページ</title>
 
   <script
     charset="utf-8"
@@ -57,7 +55,7 @@
     .line {
       height: 1px;
       background: #383838;
-      margin: 32px 0 32px;
+      margin: 32px 0;
     }
 
     #loading {
@@ -91,9 +89,6 @@
       margin-bottom: 34px;
     }
 
-    /*
-     * セクション
-     */
     .notice-section {
       margin-bottom: 42px;
     }
@@ -122,43 +117,45 @@
       margin-bottom: 18px;
     }
 
-    /*
-     * 個別案内セクション
-     */
     #personalSection {
       display: none;
     }
 
-    #personalSection .section-heading {
-      color: #f2f2f2;
-    }
-
-    /*
-     * お知らせ一覧
-     */
     .notice-list {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
-    /*
-     * 通常カード
-     */
     .notice-card {
+      overflow: hidden;
+
       background: #1b1b1b;
       border: 1px solid #383838;
-      border-radius: 14px;
+      border-radius: 16px;
+    }
 
-      padding: 22px 20px;
+    .notice-card.personal {
+      background: #202020;
+      border-color: #555555;
     }
 
     /*
-     * 個別案内カード
+     * お知らせ画像
      */
-    .notice-card.personal {
-      background: #202020;
-      border: 1px solid #555555;
+    .notice-image {
+      display: block;
+
+      width: 100%;
+      max-height: 420px;
+
+      object-fit: cover;
+
+      background: #181818;
+    }
+
+    .notice-content {
+      padding: 22px 20px;
     }
 
     .personal-label {
@@ -174,7 +171,6 @@
 
       font-size: 11px;
       font-weight: 600;
-
       letter-spacing: 0.05em;
     }
 
@@ -205,8 +201,47 @@
     }
 
     /*
-     * お知らせなし
+     * リンクボタン
      */
+    .notice-link {
+      display: flex;
+
+      width: 100%;
+
+      align-items: center;
+      justify-content: space-between;
+
+      margin-top: 20px;
+      padding: 14px 16px;
+
+      background: #292929;
+      border: 1px solid #444444;
+      border-radius: 10px;
+
+      color: #eeeeee;
+
+      text-decoration: none;
+
+      font-size: 14px;
+      font-weight: 600;
+
+      transition:
+        background .15s ease,
+        border-color .15s ease;
+    }
+
+    .notice-link:hover {
+      background: #333333;
+      border-color: #666666;
+    }
+
+    .notice-link::after {
+      content: "→";
+
+      color: #aaaaaa;
+      font-size: 17px;
+    }
+
     .empty {
       background: #1b1b1b;
       border: 1px solid #383838;
@@ -220,9 +255,6 @@
       line-height: 1.8;
     }
 
-    /*
-     * 戻る
-     */
     .back {
       display: inline-block;
 
@@ -238,9 +270,6 @@
       color: #ffffff;
     }
 
-    /*
-     * 注意書き
-     */
     .privacy-note {
       margin-top: 36px;
 
@@ -267,8 +296,12 @@
         font-size: 27px;
       }
 
-      .notice-card {
+      .notice-content {
         padding: 20px 18px;
+      }
+
+      .notice-image {
+        max-height: 300px;
       }
 
       .section-heading {
@@ -296,17 +329,14 @@
   <div class="line"></div>
 
 
-  <!-- 読み込み中 -->
   <div id="loading">
     お知らせを確認しています…
   </div>
 
 
-  <!-- エラー -->
   <div id="error"></div>
 
 
-  <!-- 認証後 -->
   <div id="content">
 
     <div
@@ -315,10 +345,7 @@
     </div>
 
 
-    <!-- =========================
-         個別案内
-         ========================= -->
-
+    <!-- 個別案内 -->
     <section
       id="personalSection"
       class="notice-section">
@@ -347,12 +374,8 @@
     </section>
 
 
-    <!-- =========================
-         全体のお知らせ
-         ========================= -->
-
-    <section
-      class="notice-section">
+    <!-- 全体のお知らせ -->
+    <section class="notice-section">
 
       <div class="section-heading">
 
@@ -415,8 +438,7 @@ async function callApi(data) {
     await fetch(
       GAS_URL,
       {
-        method:
-          "POST",
+        method: "POST",
 
         headers: {
           "Content-Type":
@@ -448,11 +470,7 @@ async function callApi(data) {
 
 
 /*
- * 安全にテキスト要素を作成
- *
- * innerHTMLを使用しないことで、
- * スプレッドシートにHTML等が入力されても
- * そのまま実行されないようにする。
+ * 安全なテキスト要素を作成
  */
 function createTextElement(
   tagName,
@@ -480,6 +498,41 @@ function createTextElement(
 
 
 /*
+ * http / https URLか再確認
+ *
+ * GASでも確認しているが、
+ * ブラウザ側でも二重チェック。
+ */
+function isSafeHttpUrl(value) {
+
+  if (
+    typeof value !== "string"
+  ) {
+    return false;
+  }
+
+
+  try {
+
+    const url =
+      new URL(value);
+
+
+    return (
+      url.protocol === "https:" ||
+      url.protocol === "http:"
+    );
+
+  } catch (_) {
+
+    return false;
+
+  }
+
+}
+
+
+/*
  * お知らせカード作成
  */
 function createNoticeCard(
@@ -497,6 +550,72 @@ function createNoticeCard(
     personal
       ? "notice-card personal"
       : "notice-card";
+
+
+  /*
+   * 画像
+   */
+  if (
+    notice.imageUrl &&
+    isSafeHttpUrl(
+      notice.imageUrl
+    )
+  ) {
+
+    const image =
+      document.createElement(
+        "img"
+      );
+
+
+    image.className =
+      "notice-image";
+
+
+    image.src =
+      notice.imageUrl;
+
+
+    image.alt =
+      notice.title
+        ? notice.title
+        : "お知らせ画像";
+
+
+    image.loading =
+      "lazy";
+
+
+    /*
+     * URL先が画像として読み込めなかった場合、
+     * 壊れた画像マークを残さない。
+     */
+    image.addEventListener(
+      "error",
+      function() {
+        image.remove();
+      }
+    );
+
+
+    card.appendChild(
+      image
+    );
+
+  }
+
+
+  /*
+   * 本文エリア
+   */
+  const content =
+    document.createElement(
+      "div"
+    );
+
+
+  content.className =
+    "notice-content";
 
 
   /*
@@ -518,7 +637,7 @@ function createNoticeCard(
       "個別のご案内";
 
 
-    card.appendChild(
+    content.appendChild(
       label
     );
 
@@ -530,7 +649,7 @@ function createNoticeCard(
    */
   if (notice.date) {
 
-    card.appendChild(
+    content.appendChild(
       createTextElement(
         "div",
         "notice-date",
@@ -546,7 +665,7 @@ function createNoticeCard(
    */
   if (notice.title) {
 
-    card.appendChild(
+    content.appendChild(
       createTextElement(
         "div",
         "notice-title",
@@ -562,7 +681,7 @@ function createNoticeCard(
    */
   if (notice.body) {
 
-    card.appendChild(
+    content.appendChild(
       createTextElement(
         "div",
         "notice-body",
@@ -573,13 +692,66 @@ function createNoticeCard(
   }
 
 
+  /*
+   * リンク
+   */
+  if (
+    notice.linkUrl &&
+    isSafeHttpUrl(
+      notice.linkUrl
+    )
+  ) {
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+
+    link.className =
+      "notice-link";
+
+
+    link.href =
+      notice.linkUrl;
+
+
+    link.textContent =
+      notice.linkText ||
+      "詳しくはこちら";
+
+
+    /*
+     * 外部ページなので
+     * 新しいタブ・ブラウザで開く。
+     */
+    link.target =
+      "_blank";
+
+
+    link.rel =
+      "noopener noreferrer";
+
+
+    content.appendChild(
+      link
+    );
+
+  }
+
+
+  card.appendChild(
+    content
+  );
+
+
   return card;
 
 }
 
 
 /*
- * 個別案内を表示
+ * 個別案内表示
  */
 function renderPersonalNotices(
   notices
@@ -600,10 +772,6 @@ function renderPersonalNotices(
   list.replaceChildren();
 
 
-  /*
-   * 個別案内が0件なら
-   * セクション自体を表示しない
-   */
   if (
     !Array.isArray(notices) ||
     notices.length === 0
@@ -639,7 +807,7 @@ function renderPersonalNotices(
 
 
 /*
- * 全体のお知らせを表示
+ * 全体のお知らせ表示
  */
 function renderGeneralNotices(
   notices
@@ -654,9 +822,6 @@ function renderGeneralNotices(
   list.replaceChildren();
 
 
-  /*
-   * 全体のお知らせが0件
-   */
   if (
     !Array.isArray(notices) ||
     notices.length === 0
@@ -762,7 +927,7 @@ async function start() {
 
 
     /*
-     * LINE IDトークン取得
+     * IDトークン取得
      */
     const idToken =
       liff.getIDToken();
@@ -782,17 +947,8 @@ async function start() {
 
 
     /*
-     * GASへお知らせ取得依頼
-     *
-     * GAS側で
-     *
-     * ・LINE IDトークン検証
-     * ・檀家マスター照合
-     * ・有効状態確認
-     * ・本人の檀家番号確認
-     * ・対象のお知らせ抽出
-     *
-     * を行う。
+     * GASで
+     * 本人認証＋対象案内抽出
      */
     const result =
       await callApi({
@@ -817,7 +973,7 @@ async function start() {
 
 
     /*
-     * 認証された檀家名
+     * 氏名
      */
     document
       .getElementById(
@@ -837,16 +993,13 @@ async function start() {
 
 
     /*
-     * 全体のお知らせ
+     * 全体案内
      */
     renderGeneralNotices(
       result.generalNotices
     );
 
 
-    /*
-     * 表示切替
-     */
     loading.style.display =
       "none";
 
