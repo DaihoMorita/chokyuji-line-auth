@@ -141,13 +141,26 @@
     }
 
     /*
+     * 画像読み込み中
+     */
+    .image-loading {
+      padding: 30px 20px;
+
+      background: #171717;
+      color: #777777;
+
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /*
      * お知らせ画像
      */
     .notice-image {
       display: block;
 
       width: 100%;
-      max-height: 420px;
+      max-height: 440px;
 
       object-fit: cover;
 
@@ -200,9 +213,6 @@
       overflow-wrap: anywhere;
     }
 
-    /*
-     * リンクボタン
-     */
     .notice-link {
       display: flex;
 
@@ -224,10 +234,6 @@
 
       font-size: 14px;
       font-weight: 600;
-
-      transition:
-        background .15s ease,
-        border-color .15s ease;
     }
 
     .notice-link:hover {
@@ -237,7 +243,6 @@
 
     .notice-link::after {
       content: "→";
-
       color: #aaaaaa;
       font-size: 17px;
     }
@@ -301,7 +306,7 @@
       }
 
       .notice-image {
-        max-height: 300px;
+        max-height: 320px;
       }
 
       .section-heading {
@@ -421,16 +426,28 @@
 
 <script>
 
+/*
+ * LINE MINI App
+ */
 const LIFF_ID =
   "2011649394-wJceQFXt";
 
 
+/*
+ * Apps Script
+ *
+ * 今まで使っている /exec URL
+ */
 const GAS_URL =
   "https://script.google.com/macros/s/AKfycbyTU8HcWkrg8glnRa1gL0UknRJEup7yLEIEycTYCSjcts32tzXa3KclmV_scM603bqgoA/exec";
 
 
+let currentIdToken =
+  "";
+
+
 /*
- * GASへPOST
+ * GASへ認証付きPOST
  */
 async function callApi(data) {
 
@@ -438,7 +455,8 @@ async function callApi(data) {
     await fetch(
       GAS_URL,
       {
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
           "Content-Type":
@@ -460,17 +478,15 @@ async function callApi(data) {
       "HTTP " +
       response.status
     );
-
   }
 
 
   return await response.json();
-
 }
 
 
 /*
- * 安全なテキスト要素を作成
+ * 安全なテキスト要素
  */
 function createTextElement(
   tagName,
@@ -493,20 +509,19 @@ function createTextElement(
 
 
   return element;
-
 }
 
 
 /*
- * http / https URLか再確認
- *
- * GASでも確認しているが、
- * ブラウザ側でも二重チェック。
+ * http / https URL確認
  */
-function isSafeHttpUrl(value) {
+function isSafeHttpUrl(
+  value
+) {
 
   if (
-    typeof value !== "string"
+    typeof value !==
+    "string"
   ) {
     return false;
   }
@@ -519,16 +534,171 @@ function isSafeHttpUrl(value) {
 
 
     return (
-      url.protocol === "https:" ||
-      url.protocol === "http:"
+      url.protocol ===
+        "https:" ||
+      url.protocol ===
+        "http:"
     );
+
 
   } catch (_) {
 
     return false;
+  }
+}
+
+
+/*
+ * 非公開Drive画像を取得
+ */
+async function loadPrivateImage(
+  fileId,
+  imageContainer
+) {
+
+  try {
+
+    const result =
+      await callApi({
+
+        action:
+          "noticeImage",
+
+        idToken:
+          currentIdToken,
+
+        fileId:
+          fileId
+
+      });
+
+
+    if (
+      !result ||
+      !result.success ||
+      !result.data ||
+      !result.mimeType
+    ) {
+
+      /*
+       * 取得できなかった場合は
+       * 画像欄自体を消す
+       */
+      imageContainer.remove();
+
+      return;
+    }
+
+
+    /*
+     * Base64 → Blob
+     *
+     * data: URLとして直接srcへ入れるより
+     * Blob URLに変換する。
+     */
+    const binary =
+      atob(
+        result.data
+      );
+
+
+    const bytes =
+      new Uint8Array(
+        binary.length
+      );
+
+
+    for (
+      let i = 0;
+      i < binary.length;
+      i++
+    ) {
+
+      bytes[i] =
+        binary.charCodeAt(i);
+
+    }
+
+
+    const blob =
+      new Blob(
+        [bytes],
+        {
+          type:
+            result.mimeType
+        }
+      );
+
+
+    const objectUrl =
+      URL.createObjectURL(
+        blob
+      );
+
+
+    const image =
+      document.createElement(
+        "img"
+      );
+
+
+    image.className =
+      "notice-image";
+
+
+    image.alt =
+      "お知らせ画像";
+
+
+    image.loading =
+      "lazy";
+
+
+    image.onload =
+      function() {
+
+        /*
+         * 表示完了後もURLは
+         * imgが使用しているので
+         * ページ終了時まで保持する。
+         */
+
+      };
+
+
+    image.onerror =
+      function() {
+
+        URL.revokeObjectURL(
+          objectUrl
+        );
+
+        imageContainer.remove();
+
+      };
+
+
+    image.src =
+      objectUrl;
+
+
+    imageContainer
+      .replaceChildren(
+        image
+      );
+
+
+  } catch (error) {
+
+    console.error(
+      "画像取得エラー",
+      error
+    );
+
+
+    imageContainer.remove();
 
   }
-
 }
 
 
@@ -553,9 +723,48 @@ function createNoticeCard(
 
 
   /*
-   * 画像
+   * 新方式：
+   * 非公開Drive画像
    */
   if (
+    notice.imageFileId
+  ) {
+
+    const imageContainer =
+      document.createElement(
+        "div"
+      );
+
+
+    imageContainer.className =
+      "image-loading";
+
+
+    imageContainer.textContent =
+      "画像を読み込んでいます…";
+
+
+    card.appendChild(
+      imageContainer
+    );
+
+
+    /*
+     * カードを先に生成して
+     * 画像は非同期取得
+     */
+    loadPrivateImage(
+      notice.imageFileId,
+      imageContainer
+    );
+
+  }
+
+  /*
+   * 旧方式：
+   * 公開画像URL
+   */
+  else if (
     notice.imageUrl &&
     isSafeHttpUrl(
       notice.imageUrl
@@ -577,23 +786,20 @@ function createNoticeCard(
 
 
     image.alt =
-      notice.title
-        ? notice.title
-        : "お知らせ画像";
+      notice.title ||
+      "お知らせ画像";
 
 
     image.loading =
       "lazy";
 
 
-    /*
-     * URL先が画像として読み込めなかった場合、
-     * 壊れた画像マークを残さない。
-     */
     image.addEventListener(
       "error",
       function() {
+
         image.remove();
+
       }
     );
 
@@ -601,7 +807,6 @@ function createNoticeCard(
     card.appendChild(
       image
     );
-
   }
 
 
@@ -640,7 +845,6 @@ function createNoticeCard(
     content.appendChild(
       label
     );
-
   }
 
 
@@ -656,7 +860,6 @@ function createNoticeCard(
         notice.date
       )
     );
-
   }
 
 
@@ -672,7 +875,6 @@ function createNoticeCard(
         notice.title
       )
     );
-
   }
 
 
@@ -688,12 +890,11 @@ function createNoticeCard(
         notice.body
       )
     );
-
   }
 
 
   /*
-   * リンク
+   * リンクボタン
    */
   if (
     notice.linkUrl &&
@@ -721,10 +922,6 @@ function createNoticeCard(
       "詳しくはこちら";
 
 
-    /*
-     * 外部ページなので
-     * 新しいタブ・ブラウザで開く。
-     */
     link.target =
       "_blank";
 
@@ -736,7 +933,6 @@ function createNoticeCard(
     content.appendChild(
       link
     );
-
   }
 
 
@@ -746,12 +942,11 @@ function createNoticeCard(
 
 
   return card;
-
 }
 
 
 /*
- * 個別案内表示
+ * 個別案内
  */
 function renderPersonalNotices(
   notices
@@ -780,9 +975,7 @@ function renderPersonalNotices(
     section.style.display =
       "none";
 
-
     return;
-
   }
 
 
@@ -802,12 +995,11 @@ function renderPersonalNotices(
 
   section.style.display =
     "block";
-
 }
 
 
 /*
- * 全体のお知らせ表示
+ * 全体のお知らせ
  */
 function renderGeneralNotices(
   notices
@@ -847,7 +1039,6 @@ function renderGeneralNotices(
 
 
     return;
-
   }
 
 
@@ -863,12 +1054,11 @@ function renderGeneralNotices(
 
     }
   );
-
 }
 
 
 /*
- * ページ起動
+ * 起動
  */
 async function start() {
 
@@ -909,7 +1099,9 @@ async function start() {
     /*
      * LINE未ログイン
      */
-    if (!liff.isLoggedIn()) {
+    if (
+      !liff.isLoggedIn()
+    ) {
 
       loading.textContent =
         "LINEへログインします…";
@@ -922,23 +1114,23 @@ async function start() {
 
 
       return;
-
     }
 
 
     /*
-     * IDトークン取得
+     * IDトークン
      */
-    const idToken =
+    currentIdToken =
       liff.getIDToken();
 
 
-    if (!idToken) {
+    if (
+      !currentIdToken
+    ) {
 
       throw new Error(
         "LINE認証情報を取得できませんでした。"
       );
-
     }
 
 
@@ -947,8 +1139,7 @@ async function start() {
 
 
     /*
-     * GASで
-     * 本人認証＋対象案内抽出
+     * お知らせ取得
      */
     const result =
       await callApi({
@@ -957,23 +1148,24 @@ async function start() {
           "notices",
 
         idToken:
-          idToken
+          currentIdToken
 
       });
 
 
-    if (!result.success) {
+    if (
+      !result.success
+    ) {
 
       throw new Error(
         result.message ||
         "お知らせを取得できませんでした。"
       );
-
     }
 
 
     /*
-     * 氏名
+     * 氏名表示
      */
     document
       .getElementById(
@@ -1010,7 +1202,9 @@ async function start() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
 
     loading.style.display =
@@ -1024,11 +1218,12 @@ async function start() {
     errorBox.textContent =
       "お知らせを表示できませんでした。" +
       "（" +
-      (error.message || "") +
+      (
+        error.message ||
+        "不明なエラー"
+      ) +
       "）";
-
   }
-
 }
 
 
